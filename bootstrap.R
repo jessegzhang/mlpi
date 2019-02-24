@@ -3,8 +3,37 @@ require(C50)
 require(snow)
 require(e1071)
 
+knn_training <- function(training_set, testing_set, predict_pointer, col_name ){
+  formula <- as.formula(paste(col_name, ' ~ .' ))
+  tr_control<- trainControl(method="none") 
+  knn_fit<-train(formula, data=training_set, method="knn", trControl=tr_control,
+                 preProcess=c("center","scale"))
+  knn_predict<-predict(knn_fit,testing_set)
+  return(mean(knn_predict==testing_set[,predict_pointer]))
+  
+}
+
+svm_training <- function(training_set, testing_set, predict_pointer, col_name ){
+  formula <- as.formula(paste(col_name, ' ~ .' ))
+  tr_control<- trainControl(method="none") 
+  svm_fit<-train(formula, data=training_set, method="svmLinear", trControl=tr_control,
+                 preProcess=c("center","scale"))
+  svm_predict<-predict(svm_fit,testing_set)
+  return(mean(svm_predict==testing_set[,predict_pointer]))
+}
+
+cfifty_training <- function(training_set, testing_set, predict_pointer, col_name ){
+  formula <- as.formula(paste(col_name, ' ~ .' ))
+  tr_control<- trainControl(method="none") 
+  cfifty_fit<-train(formula, data=training_set, method="C5.0",
+                    preProcess=c("center","scale"))
+  cfifty_predict<-predict(cfifty_fit,testing_set)
+  return(mean(cfifty_predict==testing_set[,predict_pointer]))
+}
+
+
 bootstrapCI <- function(data_set, predict_pointer ){
-  cl <- makeCluster(8, type = "SOCK") 
+  cl <- makeCluster(16, type = "SOCK") 
   clusterEvalQ(cl, {library(caret); library(C50); library(e1071)})  
   set.seed(322)
   
@@ -61,33 +90,6 @@ bootstrapCI <- function(data_set, predict_pointer ){
   return(results)
 }
 
-knn_training <- function(training_set, testing_set, predict_pointer, col_name ){
-  formula <- as.formula(paste(col_name, ' ~ .' ))
-  tr_control<- trainControl(method="none") 
-  knn_fit<-train(formula, data=training_set, method="knn", trControl=tr_control,
-                 preProcess=c("center","scale"))
-  knn_predict<-predict(knn_fit,testing_set)
-  return(mean(knn_predict==testing_set[,predict_pointer]))
-  
-}
-
-svm_training <- function(training_set, testing_set, predict_pointer, col_name ){
-  formula <- as.formula(paste(col_name, ' ~ .' ))
-  tr_control<- trainControl(method="none") 
-  svm_fit<-train(formula, data=training_set, method="svmLinear", trControl=tr_control,
-                 preProcess=c("center","scale"))
-  svm_predict<-predict(svm_fit,testing_set)
-  return(mean(svm_predict==testing_set[,predict_pointer]))
-}
-
-cfifty_training <- function(training_set, testing_set, predict_pointer, col_name ){
-  formula <- as.formula(paste(col_name, ' ~ .' ))
-  tr_control<- trainControl(method="none") 
-  cfifty_fit<-train(formula, data=training_set, method="C5.0",
-                    preProcess=c("center","scale"))
-  cfifty_predict<-predict(cfifty_fit,testing_set)
-  return(mean(cfifty_predict==testing_set[,predict_pointer]))
-}
 
 data("iris")
 bootstrap_output<-bootstrapCI(iris,5)
