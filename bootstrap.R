@@ -1,10 +1,11 @@
-library(caret)
-library(C50)
+require(caret)
+require(C50)
 require(snow)
-require(Rmpi)
+require(e1071)
+
 bootstrapCI <- function(data_set, predict_pointer ){
-  cl <- makeCluster(8, type = "MPI") 
-  
+  cl <- makeCluster(8, type = "SOCK") 
+  clusterEvalQ(cl, {library(caret); library(C50); library(e1071)})  
   set.seed(322)
   
   #comment out used for initial testing
@@ -27,9 +28,9 @@ bootstrapCI <- function(data_set, predict_pointer ){
     boot_strapped_data[[i]] <- training_set[sample(nrow(training_set), nrow(training_set), replace = TRUE, prob=NULL), ]
   }
   
-  knn_bootstrap<-parSapply(cl, boot_strapped_data, knn_training, testing_set=testing_set, predict_pointer=predict_pointer)
-  svm_bootstrap<-parSapply(cl, boot_strapped_data, svm_training, testing_set=testing_set, predict_pointer=predict_pointer)
-  cfifty_bootstrap<-parSapply(cl, boot_strapped_data, cfifty_training, testing_set=testing_set, predict_pointer=predict_pointer)
+  knn_bootstrap<-parSapply(cl, boot_strapped_data, knn_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
+  svm_bootstrap<-parSapply(cl, boot_strapped_data, svm_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
+  cfifty_bootstrap<-parSapply(cl, boot_strapped_data, cfifty_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
   # for (j in 1:200) {
   #   
   #   #knn confidence interval
@@ -60,7 +61,7 @@ bootstrapCI <- function(data_set, predict_pointer ){
   return(results)
 }
 
-knn_training <- function(training_set, testing_set, predict_pointer ){
+knn_training <- function(training_set, testing_set, predict_pointer, col_name ){
   formula <- as.formula(paste(col_name, ' ~ .' ))
   tr_control<- trainControl(method="none") 
   knn_fit<-train(formula, data=training_set, method="knn", trControl=tr_control,
@@ -70,7 +71,7 @@ knn_training <- function(training_set, testing_set, predict_pointer ){
   
 }
 
-svm_training <- function(training_set, testing_set, predict_pointer ){
+svm_training <- function(training_set, testing_set, predict_pointer, col_name ){
   formula <- as.formula(paste(col_name, ' ~ .' ))
   tr_control<- trainControl(method="none") 
   svm_fit<-train(formula, data=training_set, method="svmLinear", trControl=tr_control,
@@ -79,7 +80,7 @@ svm_training <- function(training_set, testing_set, predict_pointer ){
   return(mean(svm_predict==testing_set[,predict_pointer]))
 }
 
-cfifty_training <- function(training_set, testing_set, predict_pointer ){
+cfifty_training <- function(training_set, testing_set, predict_pointer, col_name ){
   formula <- as.formula(paste(col_name, ' ~ .' ))
   tr_control<- trainControl(method="none") 
   cfifty_fit<-train(formula, data=training_set, method="C5.0",
@@ -87,3 +88,9 @@ cfifty_training <- function(training_set, testing_set, predict_pointer ){
   cfifty_predict<-predict(cfifty_fit,testing_set)
   return(mean(cfifty_predict==testing_set[,predict_pointer]))
 }
+
+data("iris")
+bootstrap_output<-bootstrapCI(iris,5)
+fileConn<-file("bootstrap_output.txt")
+writeLines(bootstrap_output, fileConn)
+close(fileConn)
