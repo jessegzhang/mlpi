@@ -33,13 +33,11 @@ cfifty_training <- function(training_set, testing_set, predict_pointer, col_name
 
 
 bootstrapCI <- function(data_set, predict_pointer ){
-  cl <- makeCluster(16, type = "SOCK") 
+  cl <- makeCluster(16, type = "SOCK", outfile="debug.txt") 
   clusterEvalQ(cl, {library(caret); library(C50); library(e1071)})  
   set.seed(322)
   
   #comment out used for initial testing
-  data_set<-iris
-  predict_pointer<-5
   
   #splitting my datasets
   data_set[,predict_pointer]<-as.factor(data_set[,predict_pointer])
@@ -93,6 +91,4 @@ bootstrapCI <- function(data_set, predict_pointer ){
 
 data("iris")
 bootstrap_output<-bootstrapCI(iris,5)
-fileConn<-file("bootstrap_output.txt")
-writeLines(bootstrap_output, fileConn)
-close(fileConn)
+write.csv(bootstrap_output, file="bootstrap.csv")
