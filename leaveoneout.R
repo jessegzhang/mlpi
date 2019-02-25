@@ -1,6 +1,7 @@
-library(caret)
-library(C50)
-library(Rcpp)
+require(caret)
+require(C50)
+require(snow)
+require(e1071)
 
 knn_training <- function(removal_point,data_set, predict_pointer, col_name ){
   #doing leave one out
@@ -98,5 +99,5 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
 }
 
 data("iris")
-bootstrap_output<-bootstrapCI(iris,5)
-write.csv(bootstrap_output, file="leaveoneout.csv")
+leaveoneout_output<-leaveoneoutCI(iris,5)
+write.csv(leaveoneout_output, file="leaveoneout.csv")
