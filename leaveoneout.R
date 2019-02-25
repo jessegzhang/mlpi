@@ -5,8 +5,8 @@ require(e1071)
 
 knn_training <- function(removal_point,data_set, predict_pointer, col_name ){
   #doing leave one out
-  train_set<-data_set[-removal_point,]
-  test_set<-data_set[removal_point,]
+  training_set<-data_set[-removal_point,]
+  testing_set<-data_set[removal_point,]
   
   #training on the remaining set
   formula <- as.formula(paste(col_name, ' ~ .' ))
@@ -14,14 +14,14 @@ knn_training <- function(removal_point,data_set, predict_pointer, col_name ){
   knn_fit<-train(formula, data=training_set, method="knn", trControl=tr_control,
                  preProcess=c("center","scale"))
   knn_predict<-predict(knn_fit,testing_set)
-  return(predict(knn_fit,test_set)==test_set[,predict_pointer])
+  return(predict(knn_fit,testing_set)==testing_set[,predict_pointer])
   
 }
 
 svm_training <- function(removal_point,data_set, predict_pointer, col_name ){
   #doing leave one out
-  train_set<-data_set[-removal_point,]
-  test_set<-data_set[removal_point,]
+  training_set<-data_set[-removal_point,]
+  testing_set<-data_set[removal_point,]
   
   #training and predicting
   formula <- as.formula(paste(col_name, ' ~ .' ))
@@ -29,13 +29,13 @@ svm_training <- function(removal_point,data_set, predict_pointer, col_name ){
   svm_fit<-train(formula, data=training_set, method="svmLinear", trControl=tr_control,
                  preProcess=c("center","scale"))
   svm_predict<-predict(svm_fit,testing_set)
-  return(predict(svm_fit,test_set)==test_set[,predict_pointer])
+  return(predict(svm_fit,testing_set)==testing_set[,predict_pointer])
 }
 
 cfifty_training <- function(removal_point,data_set, predict_pointer, col_name ){
   #doing leave one out
-  train_set<-data_set[-removal_point,]
-  test_set<-data_set[removal_point,]
+  training_set<-data_set[-removal_point,]
+  testing_set<-data_set[removal_point,]
   
   #training and predicting
   formula <- as.formula(paste(col_name, ' ~ .' ))
@@ -43,17 +43,13 @@ cfifty_training <- function(removal_point,data_set, predict_pointer, col_name ){
   cfifty_fit<-train(formula, data=training_set, method="C5.0",
                     preProcess=c("center","scale"))
   cfifty_predict<-predict(cfifty_fit,testing_set)
-  return(predict(cfifty_fit,test_set)==test_set[,predict_pointer])
+  return(predict(cfifty_fit,testing_set)==testing_set[,predict_pointer])
 }
 
 leaveoneoutCI<- function(data_set, predict_pointer ){
   cl <- makeCluster(16, type = "SOCK", outfile="debug_leaveoneout.txt") 
   clusterEvalQ(cl, {library(caret); library(C50); library(e1071)})  
   set.seed(322)
-  
-  #comment out use for initial testing
-  data_set<-iris
-  predict_pointer<-5
   
   data_set[,predict_pointer]<-as.factor(data_set[,predict_pointer])
   
