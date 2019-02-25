@@ -33,7 +33,7 @@ cfifty_training <- function(training_set, testing_set, predict_pointer, col_name
 
 
 bootstrapCI <- function(data_set, predict_pointer ){
-  cl <- makeCluster(16, type = "SOCK", outfile="debug.txt") 
+  cl <- makeCluster(16, type = "SOCK", outfile="debug_bootstrap.txt") 
   clusterEvalQ(cl, {library(caret); library(C50); library(e1071)})  
   set.seed(322)
   
