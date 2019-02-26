@@ -1,3 +1,4 @@
+require(ggplot2)
 require(adabag)
 require(caret)
 require(C50)
@@ -51,14 +52,19 @@ bootstrapCI <- function(data_set, predict_pointer ){
   svm_bootstrap<-c(rep(NA,1000))
   col_name <- colnames(training_set)[predict_pointer]
 
-  boot_strapped_data<- vector(mode = "list", length = 1000)
+  
+  boot_strapped_data<- vector(mode = "list", length = 100)
+  print("bootstrapping data")  
   for (i in 1:1000){
     boot_strapped_data[[i]] <- training_set[sample(nrow(training_set), nrow(training_set), replace = TRUE, prob=NULL), ]
   }
-  
+  print("running adabag")
   adabag_bootstrap<-parSapply(cl, boot_strapped_data, adabag_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
+  print("running svm")
   svm_bootstrap<-parSapply(cl, boot_strapped_data, svm_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
+  print("running cfifty")
   cfifty_bootstrap<-parSapply(cl, boot_strapped_data, cfifty_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
+  print("writing results")
   # for (j in 1:200) {
   #   
   #   #knn confidence interval
@@ -86,6 +92,12 @@ bootstrapCI <- function(data_set, predict_pointer ){
   cfifty_ci<-quantile(cfifty_bootstrap,c(0.025,0.975))
   results<-c("adabag_ci"=adabag_ci, "svm_ci"=svm_ci, "cfifty_ci"=cfifty_ci)
   
+  ada_plot<-qplot(adabag_bootstrap, geom="histogram")
+  svm_plot<-qplot(svm_bootstrap, geom="histogram")
+  cfifty_plot<-qplot(cfifty_bootstrap, geom="histogram")
+  ggsave(ada_plot, file="ada_hist.pdf")
+  ggsave(svm_plot, file="svm_hist.pdf")
+  ggsave(cfifty_plot, file="cfifty_hist.pdf")
   return(results)
 }
 
