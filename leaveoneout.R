@@ -94,6 +94,10 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
   return(results)
 }
 
-data("iris")
-leaveoneout_output<-leaveoneoutCI(iris,5)
+args <- commandArgs(TRUE)
+data_file<-args[1]
+predict_pointer<-as.numeric(args[2])
+data_set<-read.csv(args[1])
+
+leaveoneout_output<-leaveoneoutCI(data_set,predict_pointer)
 write.csv(leaveoneout_output, file="leaveoneout.csv")
