@@ -1,12 +1,12 @@
+require(adabag)
 require(caret)
 require(C50)
 require(snow)
 require(e1071)
-require(adabag)
 
 adabag_training <- function(training_set, testing_set, predict_pointer, col_name ){
   formula <- as.formula(paste(col_name, ' ~ .' ))
-  tr_control<- trainControl(method="none") 
+  tr_control<- trainControl(method="none",allowParallel=TRUE)
     adabag_fit<-train(formula, data=training_set, method="AdaBag", trControl=tr_control,
                    preProcess=c("center","scale"))
   adabag_predict<-predict(adabag_fit,testing_set)
@@ -16,7 +16,7 @@ adabag_training <- function(training_set, testing_set, predict_pointer, col_name
 
 svm_training <- function(training_set, testing_set, predict_pointer, col_name ){
   formula <- as.formula(paste(col_name, ' ~ .' ))
-  tr_control<- trainControl(method="none") 
+  tr_control<- trainControl(method="none",allowParallel=TRUE)
   svm_fit<-train(formula, data=training_set, method="svmLinear", trControl=tr_control,
                  preProcess=c("center","scale"))
   svm_predict<-predict(svm_fit,testing_set)
@@ -25,7 +25,7 @@ svm_training <- function(training_set, testing_set, predict_pointer, col_name ){
 
 cfifty_training <- function(training_set, testing_set, predict_pointer, col_name ){
   formula <- as.formula(paste(col_name, ' ~ .' ))
-  tr_control<- trainControl(method="none") 
+  tr_control<- trainControl(method="none",allowParallel=TRUE)
   cfifty_fit<-train(formula, data=training_set, method="C5.0",
                     preProcess=c("center","scale"))
   cfifty_predict<-predict(cfifty_fit,testing_set)
