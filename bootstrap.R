@@ -89,6 +89,10 @@ bootstrapCI <- function(data_set, predict_pointer ){
 }
 
 
-data("iris")
-bootstrap_output<-bootstrapCI(iris,5)
+args <- commandArgs(TRUE)
+data_file<-args[1]
+predict_pointer<-as.numeric(args[2])
+data_set<-read.csv(args[1])
+
+bootstrap_output<-bootstrapCI(data_set,predict_pointer)
 write.csv(bootstrap_output, file="bootstrap.csv")
