@@ -13,14 +13,19 @@ knn_training <- function(training_set, testing_set, predict_pointer, col_name ){
     print(error_condition)
     print("adding more noise to the data to attempt to fix")
     for(i in 1:ncol(training_set)) {
-      if(is.numreic(training_set[,1])){
-        sd<-min(1,training_set[which.max(training_set[,1]),1]/10)
-        training_set[,1]<-training_set[,1]+rnorm(nrow(training_set),0,sd)
+      if(is.numreic(training_set[,i])){
+        sd<-min(1,sd(training_set[,i])/10)
+        training_set[,i]<-training_set[,i]+rnorm(nrow(training_set),0,sd)
       }
     }
-    knn_fit<-train(formula, data=training_set, method="knn", trControl=tr_control,
-                   preProcess=c("center","scale"))
   })
+  tryCatch({
+    knn_fit<-train(formula, data=training_set, method="knn", trControl=tr_control,
+                          preProcess=c("center","scale"))
+  },error = function(error_condition) {
+      return(NA)
+    })
+  
   knn_predict<-predict(knn_fit,testing_set)
   return(mean(knn_predict==testing_set[,predict_pointer]))
   
@@ -69,6 +74,9 @@ bootstrapCI <- function(data_set, predict_pointer ){
   }
   
   knn_bootstrap<-parSapply(cl, boot_strapped_data, knn_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
+  if(anyNA(knn_bootstrap)){
+    print("found NAs in KNN")
+  }
   svm_bootstrap<-parSapply(cl, boot_strapped_data, svm_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
   cfifty_bootstrap<-parSapply(cl, boot_strapped_data, cfifty_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
   # for (j in 1:200) {
