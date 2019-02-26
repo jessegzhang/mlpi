@@ -3,31 +3,13 @@ require(C50)
 require(snow)
 require(e1071)
 
-knn_training <- function(training_set, testing_set, predict_pointer, col_name ){
+adabag_training <- function(training_set, testing_set, predict_pointer, col_name ){
   formula <- as.formula(paste(col_name, ' ~ .' ))
   tr_control<- trainControl(method="none") 
-  tryCatch({
-    knn_fit<-train(formula, data=training_set, method="knn", trControl=tr_control,
+    adabag_fit<-train(formula, data=training_set, method="AdaBag", trControl=tr_control,
                    preProcess=c("center","scale"))
-  }, error = function(error_condition) {
-    print(error_condition)
-    print("adding more noise to the data to attempt to fix")
-    for(i in 1:ncol(training_set)) {
-      if(is.numreic(training_set[,i])){
-        sd<-min(1,sd(training_set[,i])/10)
-        training_set[,i]<-training_set[,i]+rnorm(nrow(training_set),0,sd)
-      }
-    }
-  })
-  tryCatch({
-    knn_fit<-train(formula, data=training_set, method="knn", trControl=tr_control,
-                          preProcess=c("center","scale"))
-  },error = function(error_condition) {
-      return(NA)
-    })
-  
-  knn_predict<-predict(knn_fit,testing_set)
-  return(mean(knn_predict==testing_set[,predict_pointer]))
+  adabag_predict<-predict(adabag_fit,testing_set)
+  return(mean(adabag_predict==testing_set[,predict_pointer]))
   
 }
 
@@ -63,7 +45,7 @@ bootstrapCI <- function(data_set, predict_pointer ){
   training_set <- data_set[data_splits,]
   testing_set <- data_set[-data_splits,]
   testing_chop <- testing_set[,-predict_pointer]
-  knn_bootstrap<-c(rep(NA,1000))
+  adabag_bootstrap<-c(rep(NA,1000))
   cfifty_bootstrap<-c(rep(NA,1000))
   svm_bootstrap<-c(rep(NA,1000))
   col_name <- colnames(training_set)[predict_pointer]
@@ -73,10 +55,7 @@ bootstrapCI <- function(data_set, predict_pointer ){
     boot_strapped_data[[i]] <- training_set[sample(nrow(training_set), nrow(training_set), replace = TRUE, prob=NULL), ]
   }
   
-  knn_bootstrap<-parSapply(cl, boot_strapped_data, knn_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
-  if(anyNA(knn_bootstrap)){
-    print("found NAs in KNN")
-  }
+  adabag_bootstrap<-parSapply(cl, boot_strapped_data, adabag_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
   svm_bootstrap<-parSapply(cl, boot_strapped_data, svm_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
   cfifty_bootstrap<-parSapply(cl, boot_strapped_data, cfifty_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
   # for (j in 1:200) {
@@ -101,10 +80,10 @@ bootstrapCI <- function(data_set, predict_pointer ){
   # }
   
   
-  knn_ci<-quantile(knn_bootstrap,c(0.025,0.975))
+  adabag_ci<-quantile(adabag_bootstrap,c(0.025,0.975))
   svm_ci<-quantile(svm_bootstrap,c(0.025,0.975))
   cfifty_ci<-quantile(cfifty_bootstrap,c(0.025,0.975))
-  results<-c("knn_ci"=knn_ci, "svm_ci"=svm_ci, "cfifty_ci"=cfifty_ci)
+  results<-c("adabag_ci"=adabag_ci, "svm_ci"=svm_ci, "cfifty_ci"=cfifty_ci)
   
   return(results)
 }
