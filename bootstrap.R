@@ -46,7 +46,8 @@ bootstrapCI <- function(data_set, predict_pointer ){
   data_splits <- createDataPartition(y = data_set[,predict_pointer], p = 0.66,list = FALSE)
   training_set <- data_set[data_splits,]
   testing_set <- data_set[-data_splits,]
-  testing_chop <- testing_set[,-predict_pointer]
+  
+  #preallocating space
   adabag_bootstrap<-c(rep(NA,1000))
   cfifty_bootstrap<-c(rep(NA,1000))
   svm_bootstrap<-c(rep(NA,1000))
@@ -86,10 +87,11 @@ bootstrapCI <- function(data_set, predict_pointer ){
   #   
   # }
   
-  
+  #calculating confidence intervals
   adabag_ci<-quantile(adabag_bootstrap,c(0.025,0.975))
   svm_ci<-quantile(svm_bootstrap,c(0.025,0.975))
   cfifty_ci<-quantile(cfifty_bootstrap,c(0.025,0.975))
+  
   results<-c("adabag_ci"=adabag_ci, "svm_ci"=svm_ci, "cfifty_ci"=cfifty_ci)
   
   ada_plot<-qplot(adabag_bootstrap, geom="histogram")
@@ -102,10 +104,10 @@ bootstrapCI <- function(data_set, predict_pointer ){
 }
 
 
-args <- commandArgs(TRUE)
-data_file<-args[1]
-predict_pointer<-as.numeric(args[2])
-data_set<-read.csv(args[1])
-
-bootstrap_output<-bootstrapCI(data_set,predict_pointer)
-write.csv(bootstrap_output, file="bootstrap.csv")
+# args <- commandArgs(TRUE)
+# data_file<-args[1]
+# predict_pointer<-as.numeric(args[2])
+# data_set<-read.csv(args[1])
+# 
+# bootstrap_output<-bootstrapCI(data_set,predict_pointer)
+# write.csv(bootstrap_output, file="bootstrap.csv")

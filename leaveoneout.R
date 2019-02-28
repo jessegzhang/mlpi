@@ -1,9 +1,11 @@
+require(ggplot2)
+require(adabag)
 require(caret)
 require(C50)
 require(snow)
 require(e1071)
 
-knn_training <- function(removal_point,data_set, predict_pointer, col_name ){
+adabag_training <- function(removal_point,data_set, predict_pointer, col_name ){
   #doing leave one out
   training_set<-data_set[-removal_point,]
   testing_set<-data_set[removal_point,]
@@ -11,10 +13,10 @@ knn_training <- function(removal_point,data_set, predict_pointer, col_name ){
   #training on the remaining set
   formula <- as.formula(paste(col_name, ' ~ .' ))
   tr_control<- trainControl(method="none") 
-  knn_fit<-train(formula, data=training_set, method="knn", trControl=tr_control,
+  adabag_fit<-train(formula, data=training_set, method="AdaBag", trControl=tr_control,
                  preProcess=c("center","scale"))
-  knn_predict<-predict(knn_fit,testing_set)
-  return(predict(knn_fit,testing_set)==testing_set[,predict_pointer])
+  adabag_predict<-predict(adabag_fit,testing_set)
+  return(predict(adabag_fit,testing_set)==testing_set[,predict_pointer])
   
 }
 
@@ -53,12 +55,12 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
   
   data_set[,predict_pointer]<-as.factor(data_set[,predict_pointer])
   
-  knn_guess<-vector(mode = "list", length = nrow(data_set))
+  adabag_guess<-vector(mode = "list", length = nrow(data_set))
   cfifty_guess<-vector(mode = "list", length = nrow(data_set))
   svm_guess<-vector(mode = "list", length = nrow(data_set))
   col_name <- colnames(data_set)[predict_pointer]
   
-  knn_leaveoneout<-parSapply(cl, 1:nrow(data_set), knn_training, data_set=data_set, predict_pointer=predict_pointer, col_name=col_name)
+  adabag_leaveoneout<-parSapply(cl, 1:nrow(data_set), adabag_training, data_set=data_set, predict_pointer=predict_pointer, col_name=col_name)
   svm_leaveoneout<-parSapply(cl, 1:nrow(data_set), svm_training, data_set=data_set, predict_pointer=predict_pointer, col_name=col_name)
   cfifty_leaveoneout<-parSapply(cl, 1:nrow(data_set), cfifty_training, data_set=data_set, predict_pointer=predict_pointer, col_name=col_name)
   
@@ -83,21 +85,21 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
   #   
   # } 
   
-  mean_knn<-sum(unlist(knn_leaveoneout))/nrow(data_set)
+  mean_adabag<-sum(unlist(adabag_leaveoneout))/nrow(data_set)
   mean_cfifty<-sum(unlist(cfifty_leaveoneout))/nrow(data_set)
   mean_svm<-sum(unlist(svm_leaveoneout))/nrow(data_set)
-  sd_knn<-sqrt((mean_knn*(1-mean_knn))/nrow(data_set))
+  sd_adabag<-sqrt((mean_adabag*(1-mean_adabag))/nrow(data_set))
   sd_cfifty<-sqrt((mean_cfifty*(1-mean_cfifty))/nrow(data_set))
   sd_svm<-sqrt((mean_svm*(1-mean_svm))/nrow(data_set))
   
-  results<-c("mean_knn"=mean_knn, "mean_cfifty"=mean_cfifty, "mean_svm"=mean_svm, "sd_knn"=sd_knn, "sd_cfifty"=sd_cfifty, "sd_svm"=sd_svm)
+  results<-c("mean_adabag"=mean_adabag, "mean_cfifty"=mean_cfifty, "mean_svm"=mean_svm, "sd_adabag"=sd_adabag, "sd_cfifty"=sd_cfifty, "sd_svm"=sd_svm)
   return(results)
 }
 
-args <- commandArgs(TRUE)
-data_file<-args[1]
-predict_pointer<-as.numeric(args[2])
-data_set<-read.csv(args[1])
-
-leaveoneout_output<-leaveoneoutCI(data_set,predict_pointer)
-write.csv(leaveoneout_output, file="leaveoneout.csv")
+# args <- commandArgs(TRUE)
+# data_file<-args[1]
+# predict_pointer<-as.numeric(args[2])
+# data_set<-read.csv(args[1])
+# 
+# leaveoneout_output<-leaveoneoutCI(data_set,predict_pointer)
+# write.csv(leaveoneout_output, file="leaveoneout.csv")
