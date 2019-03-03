@@ -106,4 +106,4 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
  data_set<-read.csv(args[1])
  
  leaveoneout_output<-leaveoneoutCI(data_set,predict_pointer)
- write.csv(leaveoneout_output, file="leaveoneout.csv")
+ write.csv(leaveoneout_output, file=file.path(".", args[3],"leaveoneout.csv"))

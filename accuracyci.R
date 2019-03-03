@@ -18,6 +18,7 @@ predict_pointer<-as.numeric(args[2])
 data_set<-read.csv(args[1])
 
 
+
 #split the data
 data_set[,predict_pointer]<-as.factor(data_set[,predict_pointer])
 data_splits <- createDataPartition(y = data_set[,predict_pointer], p = 0.70,list = FALSE)
@@ -48,4 +49,6 @@ svm_mean<-mean(svm_predict==testing_set[,predict_pointer])
 adabag_mean<-mean(adabag_predict==testing_set[,predict_pointer])
 cfifty_mean<-mean(cfifty_predict==testing_set[,predict_pointer])
 
-data<-c("svm_accuracy"=svm_mean, "adabag_accuracy"=adabag_mean, "cfifty_accuracy"=cfifty_mean)
+final_data<-c("svm_accuracy"=svm_mean, "adabag_accuracy"=adabag_mean, "cfifty_accuracy"=cfifty_mean)
+dir.create(args[3])
+write.csv(final_data, file.path(".", args[3],"true_accuracy.csv"))

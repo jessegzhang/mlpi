@@ -121,5 +121,5 @@ nonconformalCI<- function(data_set, predict_pointer ){
   data_set<-read.csv(args[1])
 
   nonconformal_output<-nonconformalCI(data_set,predict_pointer)
-  write.csv(nonconformal_output, file="nonconformal.csv")
+  write.csv(nonconformal_output, file.path(".", args[3],"nonconformal.csv"))
 
