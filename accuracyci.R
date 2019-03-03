@@ -6,9 +6,6 @@ require(snow)
 require(e1071)
 require(gower)
 
-source("leaveoneout.R")
-source("nonconformal.R")
-source("bootstrap.R")
 
 #take in data
 args[1]<-"test.csv"
