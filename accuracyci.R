@@ -24,19 +24,7 @@ data_splits <- createDataPartition(y = data_set[,predict_pointer], p = 0.70,list
 training_set <- data_set[data_splits,]
 testing_set <- data_set[-data_splits,]
 
-#call the functions
-
-leaveoneout<-leaveoneoutCI(training_set,predict_pointer)
-non_conformal<-nonconformalCI(training_set,predict_pointer)
-boot_strap<-bootstrapCI(training_set,predict_pointer)
-
-#write everything
-file_dir<-sub(".csv$","",args[1])
-dir.create(file_dir)
-
-write.csv(leaveoneout, file=file.path(".",file_dir,"leaveoneout.csv"))
-write.csv(non_conformal, file=file.path(".",file_dir,"nonconformal.csv"))
-write.csv(boot_strap, file=file.path(".",file_dir,"boot_strap.csv"))
+write.csv(training_set, file="citraining.csv", row.names=FALSE)
 
 #train yourself and report population accuracy
 

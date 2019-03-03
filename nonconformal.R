@@ -114,3 +114,12 @@ nonconformalCI<- function(data_set, predict_pointer ){
   return(conform_scores)
 }
 
+
+  args <- commandArgs(TRUE)
+  data_file<-args[1]
+  predict_pointer<-as.numeric(args[2])
+  data_set<-read.csv(args[1])
+
+  nonconformal_output<-nonconformalCI(data_set,predict_pointer)
+  write.csv(nonconformal_output, file="nonconformal.csv")
+
