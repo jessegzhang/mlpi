@@ -59,8 +59,11 @@ leaveoneoutCI<- function(data_set, predict_pointer, cl ){
   svm_guess<-vector(mode = "list", length = nrow(data_set))
   col_name <- colnames(data_set)[predict_pointer]
   
+  print("calling adabag")
   adabag_leaveoneout<-parSapply(cl, 1:nrow(data_set), adabag_training, data_set=data_set, predict_pointer=predict_pointer, col_name=col_name)
+  print("calling svm")
   svm_leaveoneout<-parSapply(cl, 1:nrow(data_set), svm_training, data_set=data_set, predict_pointer=predict_pointer, col_name=col_name)
+  print("calling cfifty")
   cfifty_leaveoneout<-parSapply(cl, 1:nrow(data_set), cfifty_training, data_set=data_set, predict_pointer=predict_pointer, col_name=col_name)
   
   
