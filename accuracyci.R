@@ -8,7 +8,6 @@ require(gower)
 
 
 #take in data
-args[1]<-"test.csv"
 args <- commandArgs(TRUE)
 data_file<-args[1]
 predict_pointer<-as.numeric(args[2])
