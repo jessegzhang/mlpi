@@ -10,26 +10,33 @@ source("leaveoneout.R")
 source("nonconformal.R")
 source("bootstrap.R")
 
+print("reading data in")
 #take in data
-args[1]<-"test.csv"
 args <- commandArgs(TRUE)
 data_file<-args[1]
 predict_pointer<-as.numeric(args[2])
 data_set<-read.csv(args[1])
 
-
+print("splitting data")
 #split the data
 data_set[,predict_pointer]<-as.factor(data_set[,predict_pointer])
 data_splits <- createDataPartition(y = data_set[,predict_pointer], p = 0.70,list = FALSE)
 training_set <- data_set[data_splits,]
 testing_set <- data_set[-data_splits,]
 
-#call the functions
+#spool up threads
+cl <- makeCluster(16, type = "SOCK", outfile="debug_bootstrap.txt") 
+clusterEvalQ(cl, {library(caret); library(C50); library(e1071); library(adabag)})  
 
-leaveoneout<-leaveoneoutCI(training_set,predict_pointer)
-non_conformal<-nonconformalCI(training_set,predict_pointer)
+#call the functions
+print("running leave one out")
+leaveoneout<-leaveoneoutCI(training_set,predict_pointer, cl)
+print("running non conformal")
+non_conformal<-nonconformalCI(training_set,predict_pointer, cl)
+print("running bootstrap")
 boot_strap<-bootstrapCI(training_set,predict_pointer)
 
+print("writting info")
 #write everything
 file_dir<-sub(".csv$","",args[1])
 dir.create(file_dir)

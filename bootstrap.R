@@ -34,9 +34,9 @@ cfifty_training <- function(training_set, testing_set, predict_pointer, col_name
 }
 
 
-bootstrapCI <- function(data_set, predict_pointer ){
-  cl <- makeCluster(16, type = "SOCK", outfile="debug_bootstrap.txt") 
-  clusterEvalQ(cl, {library(caret); library(C50); library(e1071); library(adabag)})  
+bootstrapCI <- function(data_set, predict_pointer, cl ){
+  # cl <- makeCluster(16, type = "SOCK", outfile="debug_bootstrap.txt") 
+  # clusterEvalQ(cl, {library(caret); library(C50); library(e1071); library(adabag)})  
   
   #comment out used for initial testing
   
