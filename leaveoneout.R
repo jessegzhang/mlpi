@@ -100,10 +100,10 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
   return(results)
 }
 
-# args <- commandArgs(TRUE)
-# data_file<-args[1]
-# predict_pointer<-as.numeric(args[2])
-# data_set<-read.csv(args[1])
-# 
-# leaveoneout_output<-leaveoneoutCI(data_set,predict_pointer)
-# write.csv(leaveoneout_output, file="leaveoneout.csv")
+ args <- commandArgs(TRUE)
+ data_file<-args[1]
+ predict_pointer<-as.numeric(args[2])
+ data_set<-read.csv(args[1])
+ 
+ leaveoneout_output<-leaveoneoutCI(data_set,predict_pointer)
+ write.csv(leaveoneout_output, file="leaveoneout.csv")
