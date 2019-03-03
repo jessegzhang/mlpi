@@ -7,6 +7,8 @@ require(e1071)
 
 adabag_training <- function(removal_point,data_set, predict_pointer, col_name ){
   #doing leave one out
+  print(removal_point)
+  print(data_set)
   training_set<-data_set[-removal_point,]
   testing_set<-data_set[removal_point,]
   
