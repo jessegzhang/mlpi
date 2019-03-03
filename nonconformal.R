@@ -5,7 +5,7 @@ require(C50)
 require(e1071)
 require(gower)
 
-leaveoneoutCI<- function(data_set, predict_pointer ){
+nonconformalCI<- function(data_set, predict_pointer ){
   
   #setting factor 
   data_set[,predict_pointer]<-as.factor(data_set[,predict_pointer])

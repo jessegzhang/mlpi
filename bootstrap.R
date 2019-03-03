@@ -37,13 +37,12 @@ cfifty_training <- function(training_set, testing_set, predict_pointer, col_name
 bootstrapCI <- function(data_set, predict_pointer ){
   cl <- makeCluster(16, type = "SOCK", outfile="debug_bootstrap.txt") 
   clusterEvalQ(cl, {library(caret); library(C50); library(e1071); library(adabag)})  
-  set.seed(322)
   
   #comment out used for initial testing
   
   #splitting my datasets
   data_set[,predict_pointer]<-as.factor(data_set[,predict_pointer])
-  data_splits <- createDataPartition(y = data_set[,predict_pointer], p = 0.66,list = FALSE)
+  data_splits <- createDataPartition(y = data_set[,predict_pointer], p = 0.70,list = FALSE)
   training_set <- data_set[data_splits,]
   testing_set <- data_set[-data_splits,]
   
@@ -54,7 +53,7 @@ bootstrapCI <- function(data_set, predict_pointer ){
   col_name <- colnames(training_set)[predict_pointer]
 
   
-  boot_strapped_data<- vector(mode = "list", length = 100)
+  boot_strapped_data<- vector(mode = "list", length = 1000)
   print("bootstrapping data")  
   for (i in 1:1000){
     boot_strapped_data[[i]] <- training_set[sample(nrow(training_set), nrow(training_set), replace = TRUE, prob=NULL), ]
