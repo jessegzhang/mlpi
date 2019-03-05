@@ -56,9 +56,6 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
   
   data_set[,predict_pointer]<-as.factor(data_set[,predict_pointer])
   
-  adabag_guess<-vector(mode = "list", length = nrow(data_set))
-  cfifty_guess<-vector(mode = "list", length = nrow(data_set))
-  svm_guess<-vector(mode = "list", length = nrow(data_set))
   col_name <- colnames(data_set)[predict_pointer]
   
   print("calling adabag")
