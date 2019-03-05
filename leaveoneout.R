@@ -66,21 +66,19 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
   mean_adabag<-sum(unlist(adabag_leaveoneout))/nrow(data_set)
   sd_adabag<-sqrt((mean_adabag*(1-mean_adabag))/nrow(data_set))
   rm(adabag_leaveoneout)
-  gc()
   print("calling svm")
   
   svm_leaveoneout<-parSapply(cl, 1:nrow(data_set), svm_training, data_set=data_set, predict_pointer=predict_pointer, col_name=col_name)
-  mean_cfifty<-sum(unlist(svm_leaveoneout))/nrow(data_set)
-  sd_cfifty<-sqrt((mean_cfifty*(1-mean_cfifty))/nrow(data_set))
+  mean_svm<-sum(unlist(svm_leaveoneout))/nrow(data_set)
+  sd_svm<-sqrt((mean_svm*(1-mean_svm))/nrow(data_set))
   rm(svm_leaveoneout)
-  gc()
+
   
   print("calling cfifty")
   cfifty_leaveoneout<-parSapply(cl, 1:nrow(data_set), cfifty_training, data_set=data_set, predict_pointer=predict_pointer, col_name=col_name)
-  mean_svm<-sum(unlist(svm_leaveoneout))/nrow(data_set)
-  sd_svm<-sqrt((mean_svm*(1-mean_svm))/nrow(data_set))
+  mean_cfifty<-sum(unlist(cfifty_leaveoneout))/nrow(data_set)
+  sd_cfifty<-sqrt((mean_cfifty*(1-mean_cfifty))/nrow(data_set))
   rm(cfifty_leaveoneout)
-  gc()
   
   # #leave one out cross validation
   # for(i in 1:nrow(data_set)) {
