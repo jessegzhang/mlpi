@@ -70,7 +70,7 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
   print("calling svm")
   
   svm_leaveoneout<-parSapply(cl, 1:nrow(data_set), svm_training, data_set=data_set, predict_pointer=predict_pointer, col_name=col_name)
-  mean_cfifty<-sum(unlist(cfifty_leaveoneout))/nrow(data_set)
+  mean_cfifty<-sum(unlist(svm_leaveoneout))/nrow(data_set)
   sd_cfifty<-sqrt((mean_cfifty*(1-mean_cfifty))/nrow(data_set))
   rm(svm_leaveoneout)
   gc()
