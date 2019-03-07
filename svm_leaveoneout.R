@@ -1,7 +1,6 @@
 require(ggplot2)
 require(adabag)
 require(caret)
-require(C50)
 require(snow)
 require(e1071)
 
