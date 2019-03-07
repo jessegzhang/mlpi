@@ -23,7 +23,7 @@ cfifty_training <- function(removal_point,data_set, predict_pointer, col_name ){
 
 leaveoneoutCI<- function(data_set, predict_pointer ){
   #cl <- makeCluster(16, type = "SOCK", outfile="debug_leaveoneout_cfifty.txt") 
-  clusterEvalQ(cl, {library(caret); library(C50); library(e1071)})  
+  #clusterEvalQ(cl, {library(caret); library(C50); library(e1071)})  
   
   data_set[,predict_pointer]<-as.factor(data_set[,predict_pointer])
   
