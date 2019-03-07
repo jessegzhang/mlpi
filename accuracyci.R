@@ -21,7 +21,7 @@ data_splits <- createDataPartition(y = data_set[,predict_pointer], p = 0.70,list
 training_set <- data_set[data_splits,]
 testing_set <- data_set[-data_splits,]
 
-write.csv(training_set, file="citraining.csv", row.names=FALSE)
+write.csv(training_set, file=args[4], row.names=FALSE)
 
 #train yourself and report population accuracy
 
