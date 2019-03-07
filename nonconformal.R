@@ -1,7 +1,7 @@
 require(ggplot2)
 require(adabag)
 require(caret)
-require(C50)
+require(randomForest)
 require(e1071)
 require(gower)
 
@@ -35,9 +35,9 @@ nonconformalCI<- function(data_set, predict_pointer ){
                  preProcess=c("center","scale"))
   svm_predict<-predict(svm_fit,testing_set)
   
-  cfifty_fit<-train(formula, data=training_set, method="C5.0",
+  rf_fit<-train(formula, data=training_set, method="rf",
                     preProcess=c("center","scale"))
-  cfifty_predict<-predict(cfifty_fit,testing_set)
+  rf_predict<-predict(rf_fit,testing_set)
   
   #obtaining nonconformity based on the scores given
   nonconform_calib <- rep(NA, length = calib_size)
@@ -82,13 +82,13 @@ nonconformalCI<- function(data_set, predict_pointer ){
   
   scores_svm<-rep(NA,nrow(testing_set))
   scores_adabag<-rep(NA,nrow(testing_set))
-  scores_cfifty<-rep(NA,nrow(testing_set))
+  scores_rf<-rep(NA,nrow(testing_set))
   
   for(i in 1:nrow(testing_set)) {
-    if(cfifty_predict[i]==testing_set[i,predict_pointer]){
-      scores_cfifty[i]<-1-max(p_vals[i,which(colnames(p_vals)!=cfifty_predict[i])])
+    if(rf_predict[i]==testing_set[i,predict_pointer]){
+      scores_rf[i]<-1-max(p_vals[i,which(colnames(p_vals)!=rf_predict[i])])
     } else {
-      scores_cfifty[i]<-max(p_vals[i,which(colnames(p_vals)!=cfifty_predict[i])])
+      scores_rf[i]<-max(p_vals[i,which(colnames(p_vals)!=rf_predict[i])])
     }
     
     if(adabag_predict[i]==testing_set[i,predict_pointer]){
@@ -105,12 +105,12 @@ nonconformalCI<- function(data_set, predict_pointer ){
     
   }
   mean_adabag<-mean(scores_adabag)
-  mean_cfifty<-mean(scores_cfifty)
+  mean_rf<-mean(scores_rf)
   mean_svm<-mean(scores_svm)
   sd_adabag<-sd(scores_adabag)
-  sd_cfifty<-sd(scores_cfifty)
+  sd_rf<-sd(scores_rf)
   sd_svm<-sd(scores_svm)
-  conform_scores<-data.frame("scores_adabag"=scores_adabag,"scores_svm"=scores_svm, "scores_cfifty"=scores_cfifty)
+  conform_scores<-data.frame("scores_adabag"=scores_adabag,"scores_svm"=scores_svm, "scores_rf"=scores_rf)
   return(conform_scores)
 }
 

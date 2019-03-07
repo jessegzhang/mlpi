@@ -1,7 +1,7 @@
 require(ggplot2)
 require(adabag)
 require(caret)
-require(C50)
+require(randomForest)
 require(snow)
 require(e1071)
 
@@ -24,19 +24,19 @@ svm_training <- function(training_set, testing_set, predict_pointer, col_name ){
   return(mean(svm_predict==testing_set[,predict_pointer]))
 }
 
-cfifty_training <- function(training_set, testing_set, predict_pointer, col_name ){
+rf_training <- function(training_set, testing_set, predict_pointer, col_name ){
   formula <- as.formula(paste(col_name, ' ~ .' ))
   tr_control<- trainControl(method="none")
-  cfifty_fit<-train(formula, data=training_set, method="C5.0",
+  rf_fit<-train(formula, data=training_set, method="rf", trControl=tr_control,
                     preProcess=c("center","scale"))
-  cfifty_predict<-predict(cfifty_fit,testing_set)
-  return(mean(cfifty_predict==testing_set[,predict_pointer]))
+  rf_predict<-predict(rf_fit,testing_set)
+  return(mean(rf_predict==testing_set[,predict_pointer]))
 }
 
 
 bootstrapCI <- function(data_set, predict_pointer ){
   cl <- makeCluster(16, type = "SOCK", outfile="debug_bootstrap.txt") 
-  clusterEvalQ(cl, {library(caret); library(C50); library(e1071); library(adabag)})  
+  clusterEvalQ(cl, {library(caret); library(randomForest); library(e1071); library(adabag)})  
   
   #comment out used for initial testing
   
@@ -48,7 +48,7 @@ bootstrapCI <- function(data_set, predict_pointer ){
   
   #preallocating space
   adabag_bootstrap<-c(rep(NA,1000))
-  cfifty_bootstrap<-c(rep(NA,1000))
+  rf_bootstrap<-c(rep(NA,1000))
   svm_bootstrap<-c(rep(NA,1000))
   col_name <- colnames(training_set)[predict_pointer]
 
@@ -62,8 +62,8 @@ bootstrapCI <- function(data_set, predict_pointer ){
   adabag_bootstrap<-parSapply(cl, boot_strapped_data, adabag_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
   print("running svm")
   svm_bootstrap<-parSapply(cl, boot_strapped_data, svm_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
-  print("running cfifty")
-  cfifty_bootstrap<-parSapply(cl, boot_strapped_data, cfifty_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
+  print("running rf")
+  rf_bootstrap<-parSapply(cl, boot_strapped_data, rf_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
   print("writing results")
   # for (j in 1:200) {
   #   
@@ -78,10 +78,10 @@ bootstrapCI <- function(data_set, predict_pointer ){
   #   svm_predict<-predict(svm_fit,testing_set)
   #   svm_bootstrap[j] <- mean(svm_predict==testing_set[,predict_pointer])
   #   
-  #   cfifty_fit<-train(formula, data=boot_strapped_data, method="C5.0",
+  #   rf_fit<-train(formula, data=boot_strapped_data, method="C5.0",
   #                  preProcess=c("center","scale"))
-  #   cfifty_predict<-predict(cfifty_fit,testing_set)
-  #   cfifty_bootstrap[j] <- mean(cfifty_predict==testing_set[,predict_pointer])
+  #   rf_predict<-predict(rf_fit,testing_set)
+  #   rf_bootstrap[j] <- mean(rf_predict==testing_set[,predict_pointer])
   #   
   #   
   # }
@@ -89,16 +89,16 @@ bootstrapCI <- function(data_set, predict_pointer ){
   #calculating confidence intervals
   adabag_ci<-quantile(adabag_bootstrap,c(0.025,0.975))
   svm_ci<-quantile(svm_bootstrap,c(0.025,0.975))
-  cfifty_ci<-quantile(cfifty_bootstrap,c(0.025,0.975))
+  rf_ci<-quantile(rf_bootstrap,c(0.025,0.975))
   
-  results<-c("adabag_ci"=adabag_ci, "svm_ci"=svm_ci, "cfifty_ci"=cfifty_ci)
+  results<-c("adabag_ci"=adabag_ci, "svm_ci"=svm_ci, "rf_ci"=rf_ci)
   
   ada_plot<-qplot(adabag_bootstrap, geom="histogram")
   svm_plot<-qplot(svm_bootstrap, geom="histogram")
-  cfifty_plot<-qplot(cfifty_bootstrap, geom="histogram")
+  rf_plot<-qplot(rf_bootstrap, geom="histogram")
   ggsave(ada_plot, file="ada_hist.pdf")
   ggsave(svm_plot, file="svm_hist.pdf")
-  ggsave(cfifty_plot, file="cfifty_hist.pdf")
+  ggsave(rf_plot, file="rf_hist.pdf")
   return(results)
 }
 
