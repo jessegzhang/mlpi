@@ -1,0 +1,26 @@
+Loading required package: ggplot2
+Loading required package: adabag
+Loading required package: rpart
+Loading required package: caret
+Loading required package: lattice
+Loading required package: foreach
+Loading required package: doParallel
+Loading required package: iterators
+Loading required package: parallel
+Loading required package: C50
+Loading required package: snow
+
+Attaching package: ‘snow’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, clusterSplit, makeCluster, parApply,
+    parCapply, parLapply, parRapply, parSapply, splitIndices,
+    stopCluster
+
+Loading required package: e1071
+[1] "calling cfifty"
+Error in unserialize(node$con) : error reading from connection
+Calls: leaveoneoutCI ... FUN -> recvData -> recvData.SOCKnode -> unserialize
+Execution halted
