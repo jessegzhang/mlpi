@@ -211,6 +211,9 @@ nonconformalCI<- function(data_set, predict_pointer, filepath ){
   conform_alpha_ten<-data.frame("scores_adabag"=alpha_ten_scores_adabag,"scores_svm"=alpha_ten_scores_svm, "scores_rf"=alpha_ten_scores_rf)
   conform_alpha_five<-data.frame("scores_adabag"=alpha_five_scores_adabag,"scores_svm"=alpha_five_scores_svm, "scores_rf"=alpha_five_scores_rf)
   conform_max_vals<-data.frame("scores_adabag"=max_scores_adabag,"scores_svm"=max_scores_svm, "scores_rf"=max_scores_rf)
+  write.csv(conform_alpha_ten, file.path(".", filepath,"nonconformal_alpha_ten.csv"))
+  write.csv(conform_alpha_five, file.path(".", filepath,"nonconformal_alpha_five.csv"))
+  write.csv(conform_max_vals, file.path(".", filepath,"nonconformal_max_vals.csv"))
   return(conform_scores)
 }
 
@@ -220,6 +223,6 @@ nonconformalCI<- function(data_set, predict_pointer, filepath ){
   predict_pointer<-as.numeric(args[2])
   data_set<-read.csv(args[1])
 
-  nonconformal_output<-nonconformalCI(data_set,predict_pointer, file.path(".", args[3],"nonconformal.csv"))
+  nonconformal_output<-nonconformalCI(data_set,predict_pointer, args[3])
   write.csv(nonconformal_output, file.path(".", args[3],"nonconformal.csv"))
 
