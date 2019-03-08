@@ -65,27 +65,7 @@ bootstrapCI <- function(data_set, predict_pointer ){
   print("running rf")
   rf_bootstrap<-parSapply(cl, boot_strapped_data, rf_training, testing_set=testing_set, predict_pointer=predict_pointer, col_name=col_name)
   print("writing results")
-  # for (j in 1:200) {
-  #   
-  #   #knn confidence interval
-  #   knn_fit<-train(formula, data=boot_strapped_data, method="knn", trControl=tr_control,
-  #                  preProcess=c("center","scale"))
-  #   knn_predict<-predict(knn_fit,testing_set)
-  #   knn_bootstrap[j] <- mean(knn_predict==testing_set[,predict_pointer])
-  #   
-  #   svm_fit<-train(formula, data=boot_strapped_data, method="svmLinear", trControl=tr_control,
-  #                  preProcess=c("center","scale"))
-  #   svm_predict<-predict(svm_fit,testing_set)
-  #   svm_bootstrap[j] <- mean(svm_predict==testing_set[,predict_pointer])
-  #   
-  #   rf_fit<-train(formula, data=boot_strapped_data, method="C5.0",
-  #                  preProcess=c("center","scale"))
-  #   rf_predict<-predict(rf_fit,testing_set)
-  #   rf_bootstrap[j] <- mean(rf_predict==testing_set[,predict_pointer])
-  #   
-  #   
-  # }
-  
+
   #calculating confidence intervals
   adabag_ci<-quantile(adabag_bootstrap,c(0.025,0.975))
   svm_ci<-quantile(svm_bootstrap,c(0.025,0.975))

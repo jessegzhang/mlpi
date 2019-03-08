@@ -32,28 +32,7 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
   mean_svm<-sum(unlist(svm_leaveoneout))/nrow(data_set)
   sd_svm<-sqrt((mean_svm*(1-mean_svm))/nrow(data_set))
 
-  # #leave one out cross validation
-  # for(i in 1:nrow(data_set)) {
-  #   train_set<-data_set[-i,]
-  #   test_set<-data_set[i,]
-  #   
-  #   knn_fit<-train(formula, data=train_set, method="knn", trControl=tr_control,
-  #                  preProcess=c("center","scale"))
-  #   knn_guess[i]<-(predict(knn_fit,test_set)==test_set[,predict_pointer])
-  #   
-  #   svm_fit<-train(formula, data=train_set, method="svmLinear", trControl=tr_control,
-  #                  preProcess=c("center","scale"))
-  #   svm_guess[i]<-(predict(svm_fit,test_set)==test_set[,predict_pointer])
-  #   
-  #   
-  #   cfifty_fit<-train(formula, data=train_set, method="C5.0",
-  #                     preProcess=c("center","scale"))
-  #   cfifty_guess[i]<-(predict(cfifty_fit,test_set)==test_set[,predict_pointer])
-  #   
-  # } 
-  
-  
-  
+
   
   
   results<-c("mean_svm"=mean_svm, "sd_svm"=sd_svm)

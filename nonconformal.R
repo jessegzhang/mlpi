@@ -5,7 +5,7 @@ require(randomForest)
 require(e1071)
 require(gower)
 
-nonconformalCI<- function(data_set, predict_pointer ){
+nonconformalCI<- function(data_set, predict_pointer, filepath ){
   
   #setting factor 
   data_set[,predict_pointer]<-as.factor(data_set[,predict_pointer])
@@ -104,13 +104,113 @@ nonconformalCI<- function(data_set, predict_pointer ){
     }
     
   }
-  mean_adabag<-mean(scores_adabag)
-  mean_rf<-mean(scores_rf)
-  mean_svm<-mean(scores_svm)
-  sd_adabag<-sd(scores_adabag)
-  sd_rf<-sd(scores_rf)
-  sd_svm<-sd(scores_svm)
+  
+  alpha_five_Scores_svm<-rep(NA,nrow(testing_set))
+  alpha_five_scores_adabag<-rep(NA,nrow(testing_set))
+  alpha_five_scores_rf<-rep(NA,nrow(testing_set))
+  
+  alpha_ten_scores_svm<-rep(NA,nrow(testing_set))
+  alpha_ten_scores_adabag<-rep(NA,nrow(testing_set))
+  alpha_ten_scores_rf<-rep(NA,nrow(testing_set))
+  
+  max_scores_svm<-rep(NA,nrow(testing_set))
+  max_scores_adabag<-rep(NA,nrow(testing_set))
+  max_scores_rf<-rep(NA,nrow(testing_set))
+  
+  for(i in 1:nrow(testing_set)) {
+    #precalculating the conformity scores
+    rf_conformity<-1-max(p_vals[i,which(colnames(p_vals)!=rf_predict[i])])
+    adabag_conformity<-1-max(p_vals[i,which(colnames(p_vals)!=adabag_predict[i])])
+    svm_conformity<-1-max(p_vals[i,which(colnames(p_vals)!=svm_predict[i])])
+    
+    #calculating alpha_five_scores
+    if(rf_conformity>=0.95) {
+      if(rf_predict[i]==testing_set[i,predict_pointer]) {
+        alpha_five_scores_rf<-1
+      } else {
+        alpha_five_scores_rf<-0
+      } 
+    } else {
+      alpha_five_scores_rf<-0.5
+    }
+      
+    if(svm_conformity>=0.95) {
+      if(svm_predict[i]==testing_set[i,predict_pointer]) {
+        alpha_five_scores_svm<-1
+      } else {
+        alpha_five_scores_svm<-0
+      } 
+    } else {
+      alpha_five_scores_svm<-0.5
+    }
+    
+    if(adabag_conformity>=0.95) {
+      if(adabag_predict[i]==testing_set[i,predict_pointer]) {
+        alpha_five_scores_adabag<-1
+      } else {
+        alpha_five_scores_adabag<-0
+      } 
+    } else {
+      alpha_five_scores_adabag<-0.5
+    }
+    
+    #calculating alpha_ten_scores
+    if(rf_conformity>=0.9) {
+      if(rf_predict[i]==testing_set[i,predict_pointer]) {
+        alpha_ten_scores_rf<-1
+      } else {
+        alpha_ten_scores_rf<-0
+      } 
+    } else {
+      alpha_ten_scores_rf<-0.5
+    }
+    
+    if(svm_conformity>=0.9) {
+      if(svm_predict[i]==testing_set[i,predict_pointer]) {
+        alpha_ten_scores_svm<-1
+      } else {
+        alpha_ten_scores_svm<-0
+      } 
+    } else {
+      alpha_ten_scores_svm<-0.5
+    }
+    
+    if(adabag_conformity>=0.9) {
+      if(adabag_predict[i]==testing_set[i,predict_pointer]) {
+        alpha_ten_scores_adabag<-1
+      } else {
+        alpha_ten_scores_adabag<-0
+      } 
+    } else {
+      alpha_ten_scores_adabag<-0.5
+    }
+    
+    #calculating the max conformity scores
+    if(rf_predict[i]==testing_set[i,predict_pointer]) {
+      max_scores_rf<-max(p_vals[i,])
+    } else {
+      max_scores_rf<-min(p_vals[i,])
+    }
+    
+    if(svm_predict[i]==testing_set[i,predict_pointer]) {
+      max_scores_svm<-max(p_vals[i,])
+    } else {
+      max_scores_svm<-min(p_vals[i,])
+    }
+    
+    if(adabag_predict[i]==testing_set[i,predict_pointer]) {
+      max_scores_adabag<-max(p_vals[i,])
+    } else {
+      max_scores_adabag<-min(p_vals[i,])
+    }
+  }
+  
+  
+
   conform_scores<-data.frame("scores_adabag"=scores_adabag,"scores_svm"=scores_svm, "scores_rf"=scores_rf)
+  conform_alpha_ten<-data.frame("scores_adabag"=alpha_ten_scores_adabag,"scores_svm"=alpha_ten_scores_svm, "scores_rf"=alpha_ten_scores_rf)
+  conform_alpha_five<-data.frame("scores_adabag"=alpha_five_scores_adabag,"scores_svm"=alpha_five_scores_svm, "scores_rf"=alpha_five_scores_rf)
+  conform_max_vals<-data.frame("scores_adabag"=max_scores_adabag,"scores_svm"=max_scores_svm, "scores_rf"=max_scores_rf)
   return(conform_scores)
 }
 
@@ -120,6 +220,6 @@ nonconformalCI<- function(data_set, predict_pointer ){
   predict_pointer<-as.numeric(args[2])
   data_set<-read.csv(args[1])
 
-  nonconformal_output<-nonconformalCI(data_set,predict_pointer)
+  nonconformal_output<-nonconformalCI(data_set,predict_pointer, file.path(".", args[3],"nonconformal.csv"))
   write.csv(nonconformal_output, file.path(".", args[3],"nonconformal.csv"))
 

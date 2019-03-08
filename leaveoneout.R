@@ -77,30 +77,6 @@ leaveoneoutCI<- function(data_set, predict_pointer ){
   sd_cfifty<-sqrt((mean_cfifty*(1-mean_cfifty))/nrow(data_set))
   rm(cfifty_leaveoneout)
   
-  # #leave one out cross validation
-  # for(i in 1:nrow(data_set)) {
-  #   train_set<-data_set[-i,]
-  #   test_set<-data_set[i,]
-  #   
-  #   knn_fit<-train(formula, data=train_set, method="knn", trControl=tr_control,
-  #                  preProcess=c("center","scale"))
-  #   knn_guess[i]<-(predict(knn_fit,test_set)==test_set[,predict_pointer])
-  #   
-  #   svm_fit<-train(formula, data=train_set, method="svmLinear", trControl=tr_control,
-  #                  preProcess=c("center","scale"))
-  #   svm_guess[i]<-(predict(svm_fit,test_set)==test_set[,predict_pointer])
-  #   
-  #   
-  #   cfifty_fit<-train(formula, data=train_set, method="C5.0",
-  #                     preProcess=c("center","scale"))
-  #   cfifty_guess[i]<-(predict(cfifty_fit,test_set)==test_set[,predict_pointer])
-  #   
-  # } 
-  
-
-
-
-  
   results<-c("mean_adabag"=mean_adabag, "mean_cfifty"=mean_cfifty, "mean_svm"=mean_svm, "sd_adabag"=sd_adabag, "sd_cfifty"=sd_cfifty, "sd_svm"=sd_svm)
   return(results)
 }
