@@ -76,7 +76,7 @@ nonconformalCI<- function(data_set, predict_pointer, filepath ){
   for(i in 1:nrow(testing_set)) {
     count_vals<-lapply(alpha_scores[i,], function(x) sum(nonconform_calib>=x, na.rm = TRUE))
     
-    p_vals[i,]<-lapply(count_vals, function(x) (x+theta)/(calib_size+1))
+    p_vals[i,]<-lapply(count_vals, function(x) (x)/(calib_size+1))
   }
   
   scores_svm<-rep(NA,nrow(testing_set))
