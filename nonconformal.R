@@ -14,7 +14,7 @@ nonconformalCI<- function(data_set, predict_pointer, filepath ){
   data_splits <- createDataPartition(y = data_set[,predict_pointer], p = 0.70,list = FALSE)
   training_set <- data_set[data_splits,]
   #determining training set and calibration set
-  data_splits_training<-createDataPartition(y = training_set[,predict_pointer], p = 0.80,list = FALSE)
+  data_splits_training<-createDataPartition(y = training_set[,predict_pointer], p = 0.70,list = FALSE)
   calibration_set <- training_set[-data_splits_training,]
   training_set <- training_set[data_splits_training,]
   
@@ -42,14 +42,13 @@ nonconformalCI<- function(data_set, predict_pointer, filepath ){
   #obtaining nonconformity based on the scores given
   nonconform_calib <- rep(NA, length = calib_size)
   for (i in 1:calib_size) {
-    distance_list<-gower_dist(calibration_set[i,-predict_pointer],training_set[,-predict_pointer])
-    
+    distance_list<-gower_dist(calibration_set[i,-predict_pointer],calibration_set[-i,-predict_pointer])
     #obtaining the nonconformity scores for each machine learning technique
     calib_label <- calibration_set[i,predict_pointer]
     min_same_label <-
-      min(distance_list[which(training_set[, predict_pointer] == calib_label)])
+      min(distance_list[which(calibration_set[-i, predict_pointer] == calib_label)])
     min_diff_label <-
-      min(distance_list[which(training_set[, predict_pointer] != calib_label)])
+      min(distance_list[which(calibration_set[-i, predict_pointer] != calib_label)])
     
     
     nonconform_calib[i] <- min_same_label/min_diff_label
@@ -61,13 +60,13 @@ nonconformalCI<- function(data_set, predict_pointer, filepath ){
   colnames(alpha_scores)<- unique(data_set[,predict_pointer])
   for (i in 1:nrow(testing_set)) {
     #developing gower distance list for nonconformity scores
-    distance_list<-gower_dist(testing_set[i,-predict_pointer],training_set[,-predict_pointer])
+    distance_list<-gower_dist(testing_set[i,-predict_pointer],calibration_set[,-predict_pointer])
     for (j in 1:ncol(alpha_scores)) {
       calib_label <- colnames(alpha_scores)[j]
       min_same_label <-
-        min(distance_list[which(training_set[, predict_pointer] == calib_label)])
+        min(distance_list[which(calibration_set[, predict_pointer] == calib_label)])
       min_diff_label <-
-        min(distance_list[which(training_set[, predict_pointer] != calib_label)])
+        min(distance_list[which(calibration_set[, predict_pointer] != calib_label)])
       alpha_scores[i,j] <- min_same_label/min_diff_label
     }
   }
