@@ -70,13 +70,12 @@ nonconformalCI<- function(data_set, predict_pointer, filepath ){
       alpha_scores[i,j] <- min_same_label/min_diff_label
     }
   }
-  #in some we weight the example itself but in this case we will default to 1
-  theta<-1
+  
   #obtaining p values by comparing to the calibration set
   for(i in 1:nrow(testing_set)) {
     count_vals<-lapply(alpha_scores[i,], function(x) sum(nonconform_calib>=x, na.rm = TRUE))
     
-    p_vals[i,]<-lapply(count_vals, function(x) (x+theta)/(calib_size+1))
+    p_vals[i,]<-lapply(count_vals, function(x) (x)/(calib_size+1))
   }
   
   scores_svm<-rep(NA,nrow(testing_set))
