@@ -125,82 +125,82 @@ nonconformalCI<- function(data_set, predict_pointer, filepath ){
     #calculating alpha_five_scores
     if(rf_conformity>=0.95) {
       if(rf_predict[i]==testing_set[i,predict_pointer]) {
-        alpha_five_scores_rf<-1
+        alpha_five_scores_rf[i]<-1
       } else {
-        alpha_five_scores_rf<-0
+        alpha_five_scores_rf[i]<-0
       } 
     } else {
-      alpha_five_scores_rf<-0.5
+      alpha_five_scores_rf[i]<-0.5
     }
       
     if(svm_conformity>=0.95) {
       if(svm_predict[i]==testing_set[i,predict_pointer]) {
-        alpha_five_scores_svm<-1
+        alpha_five_scores_svm[i]<-1
       } else {
-        alpha_five_scores_svm<-0
+        alpha_five_scores_svm[i]<-0
       } 
     } else {
-      alpha_five_scores_svm<-0.5
+      alpha_five_scores_svm[i]<-0.5
     }
     
     if(adabag_conformity>=0.95) {
       if(adabag_predict[i]==testing_set[i,predict_pointer]) {
-        alpha_five_scores_adabag<-1
+        alpha_five_scores_adabag[i]<-1
       } else {
-        alpha_five_scores_adabag<-0
+        alpha_five_scores_adabag[i]<-0
       } 
     } else {
-      alpha_five_scores_adabag<-0.5
+      alpha_five_scores_adabag[i]<-0.5
     }
     
     #calculating alpha_ten_scores
     if(rf_conformity>=0.9) {
       if(rf_predict[i]==testing_set[i,predict_pointer]) {
-        alpha_ten_scores_rf<-1
+        alpha_ten_scores_rf[i]<-1
       } else {
-        alpha_ten_scores_rf<-0
+        alpha_ten_scores_rf[i]<-0
       } 
     } else {
-      alpha_ten_scores_rf<-0.5
+      alpha_ten_scores_rf[i]<-0.5
     }
     
     if(svm_conformity>=0.9) {
       if(svm_predict[i]==testing_set[i,predict_pointer]) {
-        alpha_ten_scores_svm<-1
+        alpha_ten_scores_svm[i]<-1
       } else {
-        alpha_ten_scores_svm<-0
+        alpha_ten_scores_svm[i]<-0
       } 
     } else {
-      alpha_ten_scores_svm<-0.5
+      alpha_ten_scores_svm[i]<-0.5
     }
     
     if(adabag_conformity>=0.9) {
       if(adabag_predict[i]==testing_set[i,predict_pointer]) {
-        alpha_ten_scores_adabag<-1
+        alpha_ten_scores_adabag[i]<-1
       } else {
-        alpha_ten_scores_adabag<-0
+        alpha_ten_scores_adabag[i]<-0
       } 
     } else {
-      alpha_ten_scores_adabag<-0.5
+      alpha_ten_scores_adabag[i]<-0.5
     }
     
     #calculating the max conformity scores
     if(rf_predict[i]==testing_set[i,predict_pointer]) {
-      max_scores_rf<-max(p_vals[i,])
+      max_scores_rf[i]<-max(1-p_vals[i,])
     } else {
-      max_scores_rf<-min(p_vals[i,])
+      max_scores_rf[i]<-min(1-p_vals[i,])
     }
     
     if(svm_predict[i]==testing_set[i,predict_pointer]) {
-      max_scores_svm<-max(p_vals[i,])
+      max_scores_svm[i]<-max(1-p_vals[i,])
     } else {
-      max_scores_svm<-min(p_vals[i,])
+      max_scores_svm[i]<-min(1-p_vals[i,])
     }
     
     if(adabag_predict[i]==testing_set[i,predict_pointer]) {
-      max_scores_adabag<-max(p_vals[i,])
+      max_scores_adabag[i]<-max(1-p_vals[i,])
     } else {
-      max_scores_adabag<-min(p_vals[i,])
+      max_scores_adabag[i]<-min(1-p_vals[i,])
     }
   }
   
