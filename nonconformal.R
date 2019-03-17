@@ -104,7 +104,7 @@ nonconformalCI<- function(data_set, predict_pointer, filepath ){
     
   }
   
-  alpha_five_Scores_svm<-rep(NA,nrow(testing_set))
+  alpha_five_scores_svm<-rep(NA,nrow(testing_set))
   alpha_five_scores_adabag<-rep(NA,nrow(testing_set))
   alpha_five_scores_rf<-rep(NA,nrow(testing_set))
   
