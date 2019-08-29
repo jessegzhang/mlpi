@@ -45,4 +45,4 @@ predict_pointer<-as.numeric(args[2])
 data_set<-read.csv(args[1])
 
 leaveoneout_output<-leaveoneoutCI(data_set,predict_pointer)
-write.csv(leaveoneout_output, file=file.path(".", args[3],"ada_bagleaveoneout.csv"))
+write.csv(leaveoneout_output, file=file.path(args[3],"ada_bagleaveoneout.csv"))

@@ -89,4 +89,4 @@ bootstrapCI <- function(data_set, predict_pointer ){
  data_set<-read.csv(args[1])
  
  bootstrap_output<-bootstrapCI(data_set,predict_pointer)
- write.csv(bootstrap_output, file.path(".", args[3],"bootstrap.csv"))
+ write.csv(bootstrap_output, file.path(args[3],"bootstrap.csv"))
